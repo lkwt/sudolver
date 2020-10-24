@@ -2,19 +2,94 @@ from pprint import pprint
 
 from random import randint
 
-def check(play, object):
+
+def getinfo():
+    known_values=0
+    for x in play:
+        if x.v != 0:
+            known_values += 1
+    return known_values
+
+
+def check_group(sudoku_object):
     possiblevalues = set({1,2,3,4,5,6,7,8,9})
-    for x in object:
-        value = play[x].getvalue()
-        if value!=0:
-            possiblevalues.remove(value)
-    print('Mögliche Werte:')
-    pprint(possiblevalues)
+    for x in sudoku_object:
+        v = play[x].getvalue()
+        if v != 0:
+            possiblevalues.remove(v)
+    return possiblevalues
 
-def printsudoku(play,line):
+def check_Dig(dig_id):
+    #print(play[dig_id].getvalue())
+    if play[dig_id].getvalue() != 0:
+#        print('Bereits gesetzt')
+        return False
+
+    myline_possiblevalues = check_group(line[play[dig_id].line])
+    myrow_possiblevalues = check_group(row[play[dig_id].row])
+    myblock_possiblevalues = check_group(block[play[dig_id].block])
+
+    dig_intersection_values = myline_possiblevalues.intersection(myrow_possiblevalues, myblock_possiblevalues)
+
+    print('\n\nDig', dig_id)
+    print(' gefunden in Line', play[dig_id].line, 'Row', play[dig_id].row, 'Block', play[dig_id].block)
+    print(' Mögliche Werte:\n\tLine', myline_possiblevalues, '\n\tRow', myrow_possiblevalues, '\n\tBlock', myblock_possiblevalues, '\n\tIntersection:',dig_intersection_values, 'len', dig_intersection_values.__len__())
+
+    if dig_intersection_values.__len__() == 1:
+        for x in dig_intersection_values:
+            play[dig_id].setvalue(x)
+        return True
+    else:
+        play[dig_id].poss_values = dig_intersection_values
+
+        return False
+
+def check_Dig_difference_block(dig_id):
+    if play[dig_id].getvalue() != 0:
+        #        print('Bereits gesetzt')
+        return False
+
+    dig_difference_values = play[dig_id].poss_values
+    for x in block[play[dig_id].block]:
+        if x != dig_id and play[x].poss_values != {}:
+            # print( x, play[x].poss_values)
+            dig_difference_values = dig_difference_values.difference(play[x].poss_values)
+    print('\tDifference Block:', dig_difference_values)
+    if dig_difference_values.__len__() == 1:
+        for x in dig_difference_values:
+            play[dig_id].setvalue(x)
+        return True
+    else:
+        return False
+
+
+def check_Dig_difference_line(dig_id):
+    if play[dig_id].getvalue() != 0:
+        #        print('Bereits gesetzt')
+        return False
+
+    dig_difference_values = play[dig_id].poss_values
+    print(dig_difference_values)
+    for x in line[play[dig_id].line]:
+        if x != dig_id and play[x].poss_values != {}:
+            print( x, play[x].poss_values)
+            dig_difference_values = dig_difference_values.difference(play[x].poss_values)
+    print('\tPos:',dig_id, 'Difference Lines:', dig_difference_values)
+    if dig_difference_values.__len__() == 1:
+        for x in dig_difference_values:
+            play[dig_id].setvalue(x)
+        return True
+    else:
+        return False
+
+
+
+
+
+def printsudoku():
     hlim = 0
-    for l in line:
-
+    for index, l in enumerate(line):
+        print('\t\t\t',end='')
         vlim = 0
         for v in l:
             if vlim == 3:
@@ -27,22 +102,77 @@ def printsudoku(play,line):
             vlim += 1
         hlim += 1
         print()
-        if hlim == 3:
+        if hlim == 3 and index != 8:
+            print('\t\t\t---------------------')
+            hlim = 0
+
+def printstartsudoku():
+    hlim = 0
+    for index, l in enumerate(line):
+
+        vlim = 0
+        for v in l:
+            if vlim == 3:
+                print('|', end=' ')
+                vlim = 0
+            if play[v].getstartvalue()==0:
+                print(' ', end=' ')
+            else:
+                print(play[v].getstartvalue(), end=' ')
+            vlim += 1
+        hlim += 1
+        print()
+        if hlim == 3 and index != 8:
             print('---------------------')
             hlim = 0
+
 
 
 class Digs:
     def __init__(self, pcount):
         self.pcount = pcount
+        self.poss_values = set({1,2,3,4,5,6,7,8,9})
+
+        for index, v in enumerate(line):
+            if self.pcount in v:
+                self.line = index
+        for index, v in enumerate(row):
+            if self.pcount in v:
+                self.row = index
+        for index, v in enumerate(block):
+            if self.pcount in v:
+                self.block = index
+
+    def setvalue(self, v):
+        self.v = v
+        self.poss_values.clear()
+
+        for x in line[self.line]:
+            if v in play[x].poss_values:
+                play[x].poss_values.remove(v)
 
 
-    def setvalue(self, value):
-        self.value = value
+        for x in row[self.row]:
+            if v in play[x].poss_values:
+                play[x].poss_values.remove(v)
+
+        for x in block[self.block]:
+            if v in play[x].poss_values:
+                play[x].poss_values.remove(v)
+
+
+    def setstartvalue(self, v):
+        self.v = v
+        self.startv = v
+        self.poss_values.clear()
+
 
     def getvalue(self):
         #print('pCount:', self.pcount, ' Value:', self.value)
-        return self.value
+        return self.v
+
+    def getstartvalue(self):
+        return self.startv
 
 
 
@@ -121,6 +251,8 @@ fertig = list([9,1,2,8,4,6,5,7,3,
                2,3,8,7,6,5,9,4,1])
 
 
+startwert='anfang'
+
 ##zufallswerte befüllen
 #for initvalue in range(0,81):
 #    #print(initvalue, ': ')
@@ -129,29 +261,98 @@ fertig = list([9,1,2,8,4,6,5,7,3,
 #    play[initvalue].setvalue(value)
 
 #anfangswerte befüllen
-#for initvalue in range(0,81):
-#    value = anfang[initvalue]
-#    play[initvalue].setvalue(value)
-
-##endwerte befüllen
-for initvalue in range(0, 81):
-    value = fertig[initvalue]
-    play[initvalue].setvalue(value)
+for initvalue in range(0,81):
+    if startwert=='anfang':
+        value = anfang[initvalue]
+    elif startwert=='fertig':
+        value = fertig[initvalue]
+    play[initvalue].setstartvalue(value)
 
 
 
 
-printsudoku(play, line)
 
-print("Reihe 1:")
-check(play, line[0])
 
-print("Spalte 2:")
-check(play, row[1])
+#print('\nMögliche Werte:')
+#print(" Line 2:", end=' ')
+#pprint(check_group(line[1]))
 
-print("Block 3:")
-check(play, block[2])
 
+#print("  Row 5:", end=' ')
+#pprint(check_group(row[4]))
+
+
+#print("Block 2:", end=' ')
+#pprint(check_group(block[1]))
+
+print()
+
+
+startvalue = getinfo()
+
+# Algorithmus 1  Line, Row, Block check
+check = True
+loop=0
+while check:
+    check = False
+    loop += 1
+    print('Loop:', loop)
+    for dig in range(81):
+        if check_Dig(dig):
+            check = True
+    printsudoku()
+print("Total Loop:", loop)
+
+nach1 = getinfo()
+
+
+# Alorithmus 2 Block Restmenge
+
+check = True
+loop=0
+while check:
+    check = False
+    loop += 1
+    print('Loop:', loop)
+    for dig in range(81):
+        if check_Dig_difference_block(dig):
+            check = True
+    printsudoku()
+print("Total Loop:", loop)
+
+nach2 = getinfo()
+
+
+
+# Alorithmus 3 Line Restmenge
+#check_Dig_difference_line(48)
+
+
+check = True
+loop=0
+while check:
+    check = False
+    loop += 1
+    print('Loop:', loop)
+    for dig in range(81):
+        if check_Dig_difference_line(dig):
+            check = True
+        printsudoku()
+print("Total Loop:", loop)
+
+nach3 = getinfo()
+
+
+
+
+
+
+
+print()
+printstartsudoku()
+
+printsudoku()
+print('Bekannte Werte:\t Bei Start:', startvalue, '\n\t\tNach Alg 1:', nach1, '\n\t\tNach Alg 2:', nach2, '\n\t\tNach Alg 3:', nach2)
 #strukturcheck
 #print('Block 5:')
 #for x in block[5]:
