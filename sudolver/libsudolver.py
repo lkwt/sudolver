@@ -213,6 +213,9 @@ def alg_4(dig_id):
         return False
 
 
+## Aktuellen Zustand des Sudokus ausgeben
+
+
 def printsudoku():
     print(u'\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510')
     hlim = 0
@@ -269,8 +272,6 @@ def printstartsudoku():
         u'\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518')
 
 
-
-
 ### INITIALISIERUNG DES SPIELBRETTS
 
 # Liste die alle Felder-Objekte enthalten wird
@@ -318,152 +319,79 @@ block.append(list([54,55,56,63,64,65,72,73,74]))
 block.append(list([57,58,59,66,67,68,75,76,77]))
 block.append(list([60,61,62,69,70,71,78,79,80]))
 
-# Inistialisierung der 81 Felder-Objekte
-for initcount in range(0,81):
-    initDings = Digs(initcount)
-    play.append(initDings)
 
 
-# test anfang
-test1 = list([0,1,2,0,0,0,5,7,0,
-               6,0,0,5,0,1,0,0,4,
-               4,0,0,0,2,0,0,0,8,
 
-               0,2,0,0,1,0,0,5,0,
-               0,0,4,9,0,7,8,0,0,
-               0,7,0,0,8,0,0,1,0,
 
-               7,0,0,0,9,0,0,0,5,
-               5,0,0,4,0,8,0,0,6,
-               0,3,8,0,0,0,9,4,0])
-test2 = list([
-    0,2,0,9,0,0,0,0,0,
-    0,0,1,0,2,4,0,0,6,
-    7,0,0,0,0,6,0,0,0,
-    0,0,0,0,0,8,0,0,1,
-    0,6,3,5,0,1,0,0,0,
-    0,0,0,4,0,0,0,0,7,
-    0,8,0,0,0,0,1,0,5,
-    2,0,0,8,5,9,0,0,0,
-    3,0,7,0,1,0,0,0,0])
-
-test3 = list([
-    0,0,0,0,6,0,0,3,1,
-    0,0,7,9,2,0,0,0,0,
-    0,5,1,4,0,7,0,8,2,
-    0,7,8,0,0,6,0,0,0,
-    0,0,6,5,0,9,1,0,0,
-    0,0,0,2,0,0,0,0,0,
-    0,6,5,0,0,2,0,0,3,
-    2,4,0,1,0,0,5,0,0,
-    0,0,0,0,0,0,0,0,0])
-
-testleer = list([
-    0,0,0,8,0,0,0,0,0,
-    0,3,0,0,0,0,0,0,4,
-    0,0,0,0,0,7,0,0,0,
-    0,0,0,3,0,0,0,0,0,
-    0,0,0,0,0,0,0,7,0,
-    0,1,0,0,0,0,0,0,0,
-    0,6,0,0,0,0,0,0,3,
-    0,0,0,0,8,0,0,0,0,
-    7,0,0,0,0,4,0,0,9
-])
-testkiller = list([
-    7,0,0,9,2,0,0,0,4,
-    0,0,0,7,8,0,3,0,0,
-    0,3,0,0,0,0,0,9,0,
-    6,0,9,0,0,5,0,0,8,
-    0,8,0,2,0,0,7,0,0,
-    0,0,0,0,0,0,0,0,9,
-    5,0,2,0,0,0,0,0,6,
-    4,0,0,0,0,0,0,0,0,
-    0,0,0,8,0,9,1,0,0
-])
-
-testextraschwer = list([
-    9,0,0,0,2,4,0,8,0,
-    8,3,0,0,0,0,0,2,0,
-    0,0,0,0,3,0,0,7,0,
-    0,5,1,6,4,8,0,0,0,
-    0,2,0,0,0,1,0,0,0,
-    6,0,8,0,0,0,0,0,0,
-    0,8,5,0,1,0,9,0,0,
-    0,0,4,7,0,5,0,0,0,
-    2,0,0,0,0,0,0,1,0
-])
-
-# test fertig
-fertig = list([9,1,2,8,4,6,5,7,3,
-               6,8,3,5,7,1,2,9,4,
-               4,5,7,3,2,9,1,6,8,
-
-               8,2,9,6,1,3,4,5,7,
-               1,6,4,9,5,7,8,3,2,
-               3,7,5,2,8,4,6,1,9,
-
-               7,4,6,1,9,2,3,8,5,
-               5,9,1,4,3,8,7,2,6,
-               2,3,8,7,6,5,9,4,1])
+def sudolver(sudokulist):
+    # Inistialisierung der 81 Felder-Objekte
+    for initcount in range(0,81):
+        initDings = Digs(initcount)
+        play.append(initDings)
 
 
 
 
 
 
-startwert='anfang'
+    #anfangswerte befüllen
+    for initvalue in range(0,81):
+        value = sudokulist[initvalue]
+        play[initvalue].setstartvalue(value)
 
 
 
-#anfangswerte befüllen
-for initvalue in range(0,81):
-    if startwert=='anfang':
-        value = testextraschwer[initvalue]
-    elif startwert=='fertig':
-        value = fertig[initvalue]
-    play[initvalue].setstartvalue(value)
+    startvalue = getinfo()
 
 
+    algorithms = {'alg_1': alg_1,
+                  'alg_2': alg_2,
+                  'alg_3': alg_3,
+                  'alg_4': alg_4}
 
-startvalue = getinfo()
+    stats = dict()
+
+    big_loop = 0
+
+    known = startvalue
+
+    while known !=81:
+        big_loop += 1
+        last_known = known
+        for alg_name in ['alg_1', 'alg_2', 'alg_3', 'alg_4']:
+            check = True
+            loop=0
+            while check:
+                check = False
+                loop += 1
+                logging.info('Loop: ' + str(loop))
+                for dig in range(81):
+                    if algorithms[alg_name](dig):
+                        check = True
+            logging.info("Total Loop: " + str(loop))
+
+            known = getinfo()
+            stats[str(big_loop)+'_nach_'+alg_name] = getinfo()
+            stats[str(big_loop)+'_loop_'+alg_name] = loop
+        if last_known == known:
+            #print(" Eine Veränderung - abbruch")
+            break
+
+    #printstartsudoku()
+
+#    printsudoku()
+    #print('Bekannte Werte:')
+    #print('\t Bei Start:', startvalue)
+    #pprint(stats)
 
 
-algorithms = {'alg_1': alg_1,
-              'alg_2': alg_2,
-              'alg_3': alg_3,
-              'alg_4': alg_4}
+    solved_sudoku = list()
+    start_sudoku = list()
 
-stats = dict()
+    for x in play:
+        solved_sudoku.append(x.getvalue())
+    for x in play:
+        start_sudoku.append(x.getstartvalue())
 
-big_loop = 0
 
-known = startvalue
-
-while known !=81:
-    big_loop += 1
-    last_known = known
-    for alg_name in ['alg_1', 'alg_2', 'alg_3', 'alg_4']:
-        check = True
-        loop=0
-        while check:
-            check = False
-            loop += 1
-            logging.info('Loop: ' + str(loop))
-            for dig in range(81):
-                if algorithms[alg_name](dig):
-                    check = True
-        logging.info("Total Loop: " + str(loop))
-
-        known = getinfo()
-        stats[str(big_loop)+'_nach_'+alg_name] = getinfo()
-        stats[str(big_loop)+'_loop_'+alg_name] = loop
-    if last_known == known:
-        #print(" Eine Veränderung - abbruch")
-        break
-
-printstartsudoku()
-print()
-printsudoku()
-print('Bekannte Werte:')
-print('\t Bei Start:', startvalue)
-pprint(stats)
+    return  solved_sudoku, start_sudoku, stats
