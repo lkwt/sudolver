@@ -52,6 +52,7 @@ def readvalue():
     while True:
         inp = repr(readchar.readchar())
         inp = inp.strip("'")
+        inp = inp.replace("b\'", '')  # Windows Fix
         if inp == '\\x1b':
             print()
             exit()
@@ -137,6 +138,7 @@ print(' Drücke N um ein neues Rätsel einzugeben!\n Drücke L um ein Rätsel zu
 while True:
     inp = repr(readchar.readchar())
     inp = inp.strip("'")
+    inp = inp.replace("b\'",'')  # Windows Fix
     if inp == 'n':
         sudoku = input_sudoku()
 
@@ -147,6 +149,7 @@ while True:
         while True:
             inp2 = repr(readchar.readchar())
             inp2 = inp2.strip("'")
+            inp2 = inp2.replace("b\'", '')  # Windows Fix
             if inp2 == 'n':
                 break
             elif inp2 == "s":
